@@ -16,15 +16,24 @@ class MainActivity : AppCompatActivity() {
         resultado = findViewById(R.id.resultado)
     }
 
+    // Función para manejar la calculadora
     fun calcular(view: View) {
         val boton = view as Button
         val textoBoton = boton.text.toString()
-        val concatenar = resultado.text.toString() + textoBoton
+
+        // Si el botón es "Reset", limpia el campo de resultado
+        if (textoBoton == "Reset") {
+            resultado.text = "0" // Resetea la pantalla pero no cierra el programa
+            return
+        }
+
+        // Concatenar el nuevo valor presionado, pero evitando concatenar al valor "0" inicial
+        val concatenar = if (resultado.text.toString() == "0") textoBoton else resultado.text.toString() + textoBoton
         var mostrar = quitarCeros(concatenar)
 
         if (textoBoton == "=") {
             try {
-                val respuesta = eval(concatenar.dropLast(1)) // Remove the '=' at the end
+                val respuesta = eval(concatenar.dropLast(1)) // Remueve el '=' al final
                 mostrar = respuesta.toString()
             } catch (e: Exception) {
                 mostrar = "Error"
@@ -34,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         resultado.text = mostrar
     }
 
+    // Función para eliminar ceros iniciales innecesarios
     fun quitarCeros(str: String): String {
         var i = 0
         while (i < str.length && str[i] == '0') i++
@@ -70,8 +80,8 @@ class MainActivity : AppCompatActivity() {
                 var x = parseTerm()
                 while (true) {
                     when {
-                        eat('+') -> x += parseTerm() // suma
-                        eat('-') -> x -= parseTerm() // resta
+                        eat('+') -> x += parseTerm() // Suma
+                        eat('-') -> x -= parseTerm() // Resta
                         else -> return x
                     }
                 }
@@ -81,8 +91,8 @@ class MainActivity : AppCompatActivity() {
                 var x = parseFactor()
                 while (true) {
                     when {
-                        eat('*') -> x *= parseFactor() // multiplicación
-                        eat('/') -> x /= parseFactor() // división
+                        eat('*') -> x *= parseFactor() // Multiplicación
+                        eat('/') -> x /= parseFactor() // División
                         else -> return x
                     }
                 }
@@ -90,16 +100,16 @@ class MainActivity : AppCompatActivity() {
 
             fun parseFactor(): Double {
                 when {
-                    eat('+') -> return parseFactor() // operador unario más
-                    eat('-') -> return -parseFactor() // operador unario menos
+                    eat('+') -> return parseFactor() // Operador unario más
+                    eat('-') -> return -parseFactor() // Operador unario menos
                 }
 
                 var x: Double
                 val startPos = pos
-                if (eat('(')) { // paréntesis
+                if (eat('(')) { // Paréntesis
                     x = parseExpression()
                     eat(')')
-                } else if (ch in '0'..'9' || ch == '.') { // números
+                } else if (ch in '0'..'9' || ch == '.') { // Números
                     while (ch in '0'..'9' || ch == '.') nextChar()
                     x = str.substring(startPos, pos).toDouble()
                 } else {
@@ -110,3 +120,4 @@ class MainActivity : AppCompatActivity() {
         }.parse()
     }
 }
+
